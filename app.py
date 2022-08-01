@@ -14,15 +14,27 @@ def get_cat_cols():
 
 with st.sidebar:
     st.title("DATA Visualizer")
-    data = pd.read_csv(st.file_uploader(label="Upload CSV file", type='csv'))
+    try:
+        data = pd.read_csv(st.file_uploader(label="Upload CSV file", type='csv'))
+    except ValueError:
+        pass
     show = st.selectbox("What to Show", ['DataFrame', "Single column plot", "Multiple column plot"])
+
+
+try:
     cat_cols = get_cat_cols()
     numeric = data.select_dtypes(include=['int', 'float']).columns.tolist()
     num_cols = [x for x in numeric if x not in cat_cols]
+except NameError:
+    pass
 
 if show == 'DataFrame':
     st.header("Your DataFrame")
-    st.dataframe(data)
+    try:
+        st.dataframe(data)
+    except NameError:
+        st.write("Please Upload a csv file to proceed..")
+
 
 elif show == "Single column plot":
     st.header("Single column plot")
@@ -58,7 +70,7 @@ elif show == "Multiple column plot":
     st.header("Multiple column plot")
 
     type = st.selectbox("Chart Type", ['bar', 'scatter', 'line', 'boxplot', 'regressionplot', 'heatmap', 'pairplot',
-                                       'scatterplot with hue'])
+                        'scatterplot with hue'])
     c1, c2 = st.columns(2)
     if type == 'bar':
         with c1:
@@ -103,7 +115,7 @@ elif show == "Multiple column plot":
             col1 = st.selectbox('Select Column X', num_cols)
         with c2:
             col2 = st.selectbox('Select Column Y', num_cols)
-        fig = plt.figure(figsize=(10, 4))
+            fig = plt.figure(figsize=(10, 4))
         sns.regplot(x=data[col1], y=data[col2])
         st.pyplot(fig)
 
