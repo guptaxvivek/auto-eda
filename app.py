@@ -13,7 +13,7 @@ def get_cat_cols():
 
 
 with st.sidebar:
-    st.title("DATA Visualizer")
+    st.title("DATA Analyzer")
     try:
         data = pd.read_csv(st.file_uploader(label="Upload CSV file", type='csv'))
     except ValueError:
