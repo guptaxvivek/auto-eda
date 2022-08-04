@@ -35,7 +35,8 @@ if show == 'DataFrame':
 
         null_val = data.isna().sum().sum()
         rows = data.shape[0]
-        null_p = null_val/rows
+        total = data.shape[0]*data.shape[1]
+        null_p = null_val/total
         st.subheader(f"NULL Values: {null_val} ({null_p*100:.2f}%)")
         st.progress(null_p)
 
@@ -57,16 +58,17 @@ elif show == 'Column Analysis':
     st.subheader(f"Null Values: {null_val}  ({null_p*100:.2f}%)")
     st.progress(null_p)
 
-    dup_val = data[sel_col].duplicated().sum()
-    dup_p = dup_val/data[sel_col].shape[0]
-    st.subheader(f"Duplicated Values: {dup_val} ({dup_p*100:.2f}%)")
-    st.progress(dup_p)
 
     if sel_col in num_cols:
-        st.subheader("Descriptive Stats")
-        st.write(f"Average: {data[sel_col].mean()}")
-        st.write(f"Min: {data[sel_col].min()}")
-        st.write(f"Max: {data[sel_col].max()}")
+        st.header("Descriptive Stats")
+        st.subheader(f"Average: {data[sel_col].mean()}")
+        st.subheader(f"Min: {data[sel_col].min()}")
+        st.subheader(f"Max: {data[sel_col].max()}")
+
+        dup_val = data[sel_col].duplicated().sum()
+        dup_p = dup_val / data[sel_col].shape[0]
+        st.subheader(f"Duplicated Values: {dup_val} ({dup_p * 100:.2f}%)")
+        st.progress(dup_p)
 
         st.subheader("Histogram")
         fig = plt.figure(figsize=(10, 4))
@@ -80,8 +82,8 @@ elif show == 'Column Analysis':
 
     elif sel_col in cat_cols:
         distinct = data[sel_col].nunique()
-        distinct_p = distinct/data[sel_col].shape[0]
-        st.subheader(f"Distinct Values: {data[sel_col].nunique()} ({distinct_p*100:.2f}%)")
+        distinct_p = distinct / data[sel_col].shape[0]
+        st.subheader(f"Distinct Values: {data[sel_col].nunique()} ({distinct_p * 100:.2f}%)")
         st.progress(distinct_p)
 
         st.subheader("CountPlot")
@@ -95,6 +97,16 @@ elif show == 'Column Analysis':
         data[sel_col].value_counts().plot(kind='pie', autopct='%.1f')
         st.pyplot(fig)
 
+    else:
+        distinct = data[sel_col].nunique()
+        distinct_p = distinct / data[sel_col].shape[0]
+        st.subheader(f"Distinct Values: {data[sel_col].nunique()} ({distinct_p * 100:.2f}%)")
+        st.progress(distinct_p)
+
+        dup_val = data[sel_col].duplicated().sum()
+        dup_p = dup_val / data[sel_col].shape[0]
+        st.subheader(f"Duplicated Values: {dup_val} ({dup_p * 100:.2f}%)")
+        st.progress(dup_p)
 
 elif show == "Visualization":
     st.header("Multiple column plot")
@@ -168,5 +180,5 @@ elif show == "Visualization":
         with s3:
             col3 = st.selectbox('Hue Column', cat_cols)
         fig = plt.figure(figsize=(10, 4))
-        sns.scatterplot(x=data[col1], y=data[col2], hue=data[col3], palette='mako',alpha=0.8)
+        sns.scatterplot(x=data[col1], y=data[col2], hue=data[col3], palette='mako', alpha=0.8)
         st.pyplot(fig)
